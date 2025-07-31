@@ -1,12 +1,16 @@
-# Project #19: Segmentation of sparse bacteria in human tissue
+  <a href="https://ai4life.eurobioimaging.eu/open-calls/">
+    <img src="https://github.com/ai4life-opencalls/.github/blob/main/AI4Life_banner_giraffe_nodes_OC.png?raw=true" width="70%">
+  </a>
+</p>
 
+# Project #19: Segmentation of sparse bacteria in human tissue
 
 
 ## Project Overview
 
 This repository contains the code and notebooks for preparing ground truth data for training, training a 3D Stardist model, and then use it on unseen data for **Sparse bacteria segmentation in tissue samples**. 
 The project implements deep learning approaches for automated detection and segmentation of bacterial cells in complex tissue environments using 3D microscopy data. 
-Developed as part of the [AI4Life project](https://ai4life.eurobioimaging.eu), it uses data provided by ***.
+Developed as part of the [AI4Life project](https://ai4life.eurobioimaging.eu), it uses data provided by Sebastien Herbert from University of Basel in Switzerland.
 All images used in this tutorial are licensed under **CC-BY**. If any of the instructions are not working, please [open an issue]
 
 
@@ -22,9 +26,9 @@ The main goal is to develop robust AI models for:
 ```
 AI4LIfe_OC_StaphInTissue/
 ├── notebooks/
-│   ├── 0_dataset_split_train_test.ipynb                          # Dataset preparation and splitting
-│   ├── 0.1_Label_watershed.ipynb                                 # Watershed-based labeling
-│   ├── 0.2_train_dataset_normalize_crop.ipynb                    # Data preprocessing
+│   ├── 0.1_summary_fov_per_sample_id.ipynb                       # Dataset preparation and splitting
+│   ├── 0.2_label_watershed.ipynb                                 # Watershed-based labeling
+│   ├── 0.3_normalize_and_crop.ipynb                              # Data preprocessing
 │   ├── StarDist_3D_DL4MicEverywhere_Modified_AI4LifeOC.ipynb     # Main StarDist 3D notebook for training and inference
 │   └── data_identifier.csv                                       # Dataset metadata
 ├── env_requirements.txt                                          # Python dependencies
@@ -51,40 +55,26 @@ git clone https://github.com/ai4life-opencalls/****.git
 
 ## 📊 Workflow
 
-The project follows a structured workflow for bacterial segmentation:
+The workflow was designed to use the available notebooks in the following order:
 
-### 1. Data Preparation (`0_dataset_split_train_test.ipynb`)
-- Cross-reference of images with metadata
-- Generate summary of available data
+### 1. Data Preparation (`0.1_summary_fov_per_sample_id.ipynb`)
+- Cross-reference of images with sample ID metadata
+- Generates a summary of available data per sample ID, including any empty FOVs (Fields of View)
 - Allows for informed dataset splitting into training and testing sets by the user
 
-### 2. Label Refinement (`0.1_Label_watershed.ipynb`)
-- Handling of touching/overlapping bacteria labeled together
+### 2. Label Refinement (`0.2_label_watershed.ipynb`)
+- Handling of touching/overlapping bacteria labeled as a single instance
 - Application of watershed algorithm for improved instance labeling
 
-### 3. Data Preprocessing (`0.2_train_dataset_normalize_crop.ipynb`)
-- Image normalization and cropping
-- Preparation of training dataset for StarDist 3D model
-- Reduction of empty background regions to optimize training efficiency
+### 3. Data Preprocessing (`0.3_normalize_and_crop.ipynb`)
+- Image normalization and cropping, needed **only for the training data** due to its large size
+- Cropping considers regions with bacteria to balance the ratio of empty background regions and optimize training efficiency
+- This step is required to avoid the time consuming processing in the dataloaders during training, this step in not needed for the testing data nor inference as it is integrated in the prediction functions
 
 ### 4. Model Training (`StarDist_3D_DL4MicEverywhere_Modified_AI4LifeOC.ipynb`)
-- StarDist 3D model implementation
+- DL4MicEverywhere StarDist 3D model training, validation, and inference
 - Custom modifications for large image handling
-- Training and validation procedures
-- Model evaluation and quality control
 
-## 🔬 Methodology
-
-The project utilizes **StarDist 3D**, a state-of-the-art deep learning approach for:
-- Star-convex object detection in 3D microscopy images
-- Accurate segmentation of spherical bacterial cells
-- Instance segmentation for overlapping objects
-
-### Key Features:
-- **3D segmentation**: Full volumetric processing of microscopy stacks
-- **Quality control**: Comprehensive validation metrics (IoU, precision, recall)
-- **Visualization**: Interactive tools for result inspection
-- **Scalability**: Tiled processing for large images
 
 ## 📈 Results
 
@@ -93,31 +83,13 @@ The model provides:
 - Quality metrics and validation reports
 - Interactive visualization of results
 
-## 🛠️ Usage
-
-### Training a New Model
-
-1. If multiple image sets have the same source prepare a metadata file like `data_identifier.csv`
-2. Run the data preparation notebooks in sequence:
-   ```
-   notebooks/0_dataset_split_train_test.ipynb
-   notebooks/0.1_Label_watershed.ipynb
-   notebooks/0.2_train_dataset_normalize_crop.ipynb
-   ```
-3. Train the StarDist model:
-   ```
-   notebooks/StarDist_3D_DL4MicEverywhere_Modified_AI4LifeOC.ipynb
-   ```
-
-### Inference on New Data
-
-Use the trained model section in the main notebook to process new images.
 
 ## 📚 References
 
-- Schmidt, U., et al. "Cell detection with star-convex polygons." MICCAI 2018.
-- Weigert, M., et al. "Star-convex polyhedra for 3d object detection and segmentation in microscopy." WACV 2020.
-- von Chamier, L., et al. "Democratising deep learning for microscopy with ZeroCostDL4Mic." Nature Communications 2021.
+- Schmidt, Uwe, et al. "Cell detection with star-convex polygons." International conference on medical image computing and computer-assisted intervention. Cham: Springer International Publishing, 2018.
+- Weigert, Martin, et al. "Star-convex polyhedra for 3D object detection and segmentation in microscopy." Proceedings of the IEEE/CVF winter conference on applications of computer vision. 2020.
+- Von Chamier, Lucas, et al. "Democratising deep learning for microscopy with ZeroCostDL4Mic." Nature communications 12.1 (2021): 2276.
+- Hidalgo-Cenalmor, Iván, et al. "DL4MicEverywhere: deep learning for microscopy made flexible, shareable and reproducible." Nature methods 21.6 (2024): 925-927.
 
 ## Acknowledgements
 AI4Life has received funding from the European Union’s Horizon Europe research and innovation programme under grant agreement number 101057970. Views and opinions expressed are however those of the author(s) only and do not necessarily reflect those of the European Union or the European Research Council Executive Agency. Neither the European Union nor the granting authority can be held responsible for them.
